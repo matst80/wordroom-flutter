@@ -204,7 +204,7 @@ class _MyHomePageState extends State<MyHomePage> {
     if (!_current.contains(idx) &&
         !_taken.contains(idx) &&
         idx >= 0 &&
-        idx <= total) {
+        idx <= total && idx!=null) {
       setState(() {
         _current.add(idx);
         _currentWord = _current.map((idx)=>_charList[idx].char).join("");
