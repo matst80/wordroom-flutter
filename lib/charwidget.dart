@@ -1,7 +1,12 @@
 import 'package:flutter/material.dart';
 
 class CharWidget extends StatelessWidget {
-  CharWidget({this.char, this.taken, this.selected, this.highlighted, this.onLongPress});
+  CharWidget(
+      {@required this.char,
+      this.taken,
+      this.selected,
+      this.highlighted,
+      this.onLongPress});
 
   final String char;
   final bool taken;
@@ -36,7 +41,7 @@ class CharWidget extends StatelessWidget {
         margin: EdgeInsets.all(selected ? 7 : 2),
         child: GestureDetector(
           onLongPress: () {
-            onLongPress();
+            onLongPress?.call();
           },
             child: Center(
                 child: Text(taken ? '' : char.toUpperCase(),
