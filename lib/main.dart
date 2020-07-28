@@ -1,21 +1,29 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
+import 'package:preferences/preferences.dart';
 import 'package:share/share.dart';
+import 'package:unique_identifier/unique_identifier.dart';
 import 'package:wordroom/gridwidget.dart';
 import 'package:wordroom/hints.dart';
+import 'package:wordroom/settingsview.dart';
 
 import 'linklistener.dart';
 import 'models.dart';
 import 'wordroom_api.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await PrefService.init(prefix: 'wr_');
+
+  PrefService.setDefaultValues({'language': 'en'});
+
   runApp(WordRoomOnline());
 }
 
 class WordRoomOnline extends StatelessWidget {
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -49,29 +57,18 @@ class _WordroomState extends LinkListener<WordroomPlayGrid> {
   WordroomApi _api;
   HintManager _hintManager;
   String _currentWord = "";
-  String title = "Wordroom";
 
-/*
-  String _identifier = 'Unknown';
-
-  Future<void> initUniqueIdentifierState() async {
-    String identifier;
+  Future<void> _initUniqueIdentifierState() async {
     try {
-      identifier = await UniqueIdentifier.serial;
+      var identifier = await UniqueIdentifier.serial;
+      PrefService.setString("userid", identifier);
     } on PlatformException {
-      identifier = 'Failed to get Unique Identifier';
+      print("not supported deviceid");
     }
-
-    if (!mounted) return;
-
-    setState(() {
-      _identifier = identifier;
-    });
   }
-*/
 
   Future<void> _startLevel() async {
-    var board = await _api.startRandom("en");
+    var board = await _api.startRandom(PrefService.get("language"));
     setState(() {
       _board = board;
     });
@@ -86,7 +83,9 @@ class _WordroomState extends LinkListener<WordroomPlayGrid> {
 
   @override
   void processLink(String link) {
-    var sessionToLoad = link.split('/').last;
+    var sessionToLoad = link
+        .split('/')
+        .last;
     print("loading: $sessionToLoad");
     _joinLevel(sessionToLoad);
   }
@@ -96,6 +95,7 @@ class _WordroomState extends LinkListener<WordroomPlayGrid> {
     _board = Board.empty();
     super.initState();
     startLinkListeners();
+    _initUniqueIdentifierState();
     _startLevel();
   }
 
@@ -146,9 +146,10 @@ class _WordroomState extends LinkListener<WordroomPlayGrid> {
         api: _api,
         game: _board,
         hintManager: _hintManager,
-        onWordChange: (word) => setState(() {
-          _currentWord = word;
-        }),
+        onWordChange: (word) =>
+            setState(() {
+              _currentWord = word;
+            }),
         onMoveResponse: (moveResponse) {
           var noMoves = moveResponse.moves;
           if (moveResponse.levelComplete) {
@@ -176,14 +177,23 @@ class _WordroomState extends LinkListener<WordroomPlayGrid> {
             Text(
               "$_currentWord   ",
               style: TextStyle(),
-            )
+            ),
+            IconButton(
+              icon: Icon(Icons.settings),
+              padding: EdgeInsets.fromLTRB(20, 10, 20, 10),
+              iconSize: 32,
+              color: Colors.purple,
+              onPressed: () {
+                Navigator.push(context, MaterialPageRoute(
+                    builder: (context) => SettingsPage(title: 'Settings')),);
+              },
+            ),
           ],
         ),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           _startLevel();
-          //_showHint();
         },
         child: Icon(Icons.restore),
       ),
