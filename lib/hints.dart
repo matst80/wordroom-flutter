@@ -18,7 +18,7 @@ class HintManager {
   Timer _timer;
   Queue _hints;
   List<HintProviderWorker> _workers;
-  Duration duration = Duration(seconds: 1);
+  Duration duration = Duration(milliseconds: 600);
 
   void addWorker(HintProviderWorker worker) {
     if (!_workers.contains(worker)) _workers.add(worker);

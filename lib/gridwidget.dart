@@ -86,10 +86,38 @@ class _GridWidgetState extends State<GridWidget> with HintProviderWorker {
     });
   }
 
+  int _getWordIndex(idx) {
+    int result = 0;
+    var i = 0;
+    widget.game.paths.forEach((key, v) {
+      if (v is List<dynamic>) {
+        if (v.contains(idx)) {
+          result = i + 0;
+        }
+      }
+      i++;
+    });
+    return result;
+  }
+
+  Color _offset(Color base, int val) {
+    var r = base.red - val;
+    var g = base.green + val;
+    var b = base.blue - val;
+    return base.withGreen(g).withBlue(b).withRed(r);
+  }
+
+  Color _getColor(idx) {
+    if (widget.game.paths != null) {
+      return _offset(Colors.deepPurple, _getWordIndex(idx) * 15);
+    }
+    return Colors.deepPurple;
+  }
+
   List<CharWidget> _getChars() =>
-      List.from(widget.game.charList.map((e) =>
-          CharWidget(
+      List.from(widget.game.charList.map((e) => CharWidget(
             char: e.char,
+            wordColor: _getColor(e.idx),
             highlighted: _highlighted.contains(e.idx),
             taken: _taken.contains(e.idx),
             selected: _current.contains(e.idx),

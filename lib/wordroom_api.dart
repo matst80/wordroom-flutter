@@ -41,13 +41,14 @@ class WordroomApi {
     return Board(response.body);
   }
 
-  Future<String> getHint(int sessionId, int boardId) async {
+  Future<HintResponse> getHint(int sessionId, int boardId) async {
     var response = await _get("$baseUrl/api/hint/$sessionId/$boardId");
     var jsonAnswer = jsonDecode(response.body);
-    return jsonAnswer["word"];
+    var path = jsonAnswer["path"].cast<int>();
+    return HintResponse(jsonAnswer["word"], path);
   }
 
-  Future<String> getBoardHint(Board board) {
+  Future<HintResponse> getBoardHint(Board board) {
     return getHint(board.sessionId, board.boardId);
   }
 

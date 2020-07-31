@@ -23,6 +23,14 @@ void main() async {
   runApp(WordRoomOnline());
 }
 
+class MyBehavior extends ScrollBehavior {
+  @override
+  Widget buildViewportChrome(
+      BuildContext context, Widget child, AxisDirection axisDirection) {
+    return child;
+  }
+}
+
 class WordRoomOnline extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -33,6 +41,12 @@ class WordRoomOnline extends StatelessWidget {
         backgroundColor: Colors.purpleAccent.shade700,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
+      builder: (context, child) {
+        return ScrollConfiguration(
+          behavior: MyBehavior(),
+          child: child,
+        );
+      },
       home: WordroomPlayGrid(title: 'Wordroom'),
     );
   }
@@ -122,9 +136,15 @@ class _WordroomState extends LinkListener<WordroomPlayGrid> {
 
   void _queueHint() async {
     var hint = await _api.getBoardHint(_board);
-    hint.split("").forEach((char) {
-      _hintManager.queueHint(char);
-    });
+    if (hint.path != null && hint.path.isNotEmpty) {
+      hint.path.reversed.forEach((nr) {
+        _hintManager.queueHint(List<int>.filled(1, nr));
+      });
+    } else {
+      hint.word.split("").forEach((char) {
+        _hintManager.queueHint(char);
+      });
+    }
   }
 
   @override
@@ -142,21 +162,50 @@ class _WordroomState extends LinkListener<WordroomPlayGrid> {
         ],
         title: Text(_board.title),
       ),
-      body: GridWidget(
-        api: _api,
-        game: _board,
-        hintManager: _hintManager,
-        onWordChange: (word) =>
-            setState(() {
-              _currentWord = word;
-            }),
-        onMoveResponse: (moveResponse) {
-          var noMoves = moveResponse.moves;
-          if (moveResponse.levelComplete) {
-            _shareSession(
-                'You made it!', 'Well done. it only took $noMoves moves');
-          }
-        },
+      body: Column(
+        mainAxisSize: MainAxisSize.max,
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Expanded(
+              child: Container(
+                  padding: EdgeInsets.all(10),
+                  child: GridWidget(
+                    api: _api,
+                    game: _board,
+                    hintManager: _hintManager,
+                    onWordChange: (word) =>
+                        setState(() {
+                          _currentWord = word;
+                        }),
+                    onMoveResponse: (moveResponse) {
+                      var noMoves = moveResponse.moves;
+                      if (moveResponse.levelComplete) {
+                        _shareSession('You made it!',
+                            'Well done. it only took $noMoves moves');
+                      }
+                    },
+                  ))),
+          Center(
+            child: Container(
+                padding: EdgeInsets.fromLTRB(0, 5, 0, 40),
+                child: Text(
+                  "$_currentWord",
+                  style: TextStyle(
+                    color: Colors.white,
+                    letterSpacing: 8,
+                    fontSize: 38,
+                    shadows: [
+                      Shadow(
+                        blurRadius: 4.0,
+                        color: Colors.black,
+                        offset: Offset(2.0, 2.0),
+                      ),
+                    ],
+                  ),
+                )),
+          ),
+        ],
       ),
       bottomNavigationBar: BottomAppBar(
         shape: CircularNotchedRectangle(),
@@ -174,18 +223,17 @@ class _WordroomState extends LinkListener<WordroomPlayGrid> {
                 _queueHint();
               },
             ),
-            Text(
-              "$_currentWord   ",
-              style: TextStyle(),
-            ),
             IconButton(
               icon: Icon(Icons.settings),
               padding: EdgeInsets.fromLTRB(20, 10, 20, 10),
               iconSize: 32,
               color: Colors.purple,
               onPressed: () {
-                Navigator.push(context, MaterialPageRoute(
-                    builder: (context) => SettingsPage(title: 'Settings')),);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => SettingsPage(title: 'Settings')),
+                );
               },
             ),
           ],

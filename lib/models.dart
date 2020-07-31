@@ -23,7 +23,9 @@ class Board {
         gridString.split('').map((char) => CharPosition(char: char, idx: i++)));
 
     // debug only
-    words = board["words"];
+    words = board["words"].cast<String>();
+    paths = board["paths"];
+    code = board["code"];
   }
 
   String title;
@@ -31,6 +33,9 @@ class Board {
   int sessionId;
   int boardId;
   String language;
+  String code;
+
+  Map paths;
 
   int get width => 6;
 
@@ -47,6 +52,13 @@ class CharPosition {
 
   final String char;
   final int idx;
+}
+
+class HintResponse {
+  final String word;
+  final List<int> path;
+
+  HintResponse(this.word, this.path);
 }
 
 class MoveResponse {
