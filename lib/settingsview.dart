@@ -35,14 +35,19 @@ class _SettingsState extends State<SettingsPage> {
         PreferenceTitle('General'),
         DropdownPreference(
           'Language',
-          'language',
-          defaultVal: 'en',
-          values: ['en', 'sv'],
+          'language_id',
+          defaultVal: '1',
+          values: ['1', '2'],
         ),
         PreferenceTitle('User'),
         TextFieldPreference(
-          'Display Name',
-          'user_display_name',
+          'Email',
+          'email',
+        ),
+        TextFieldPreference(
+          'Password',
+          'password',
+          obscureText: true,
         ),
         PreferenceTitle('Advanced'),
         CheckboxPreference('Enable Advanced Features', 'advanced_enabled')

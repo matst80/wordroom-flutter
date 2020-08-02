@@ -10,30 +10,25 @@ class Board {
 
   Board(String jsonString) {
     var data = jsonDecode(jsonString);
-    var board = data["board"];
-    var session = data["session"];
-    var gridString = board["charlist"];
+
+    var gridString = data["charlist"];
     var i = 0;
 
-    sessionId = session["id"];
-    boardId = board["id"];
-    title = board["title"];
+    sessionId = data["sessionId"];
+    title = data["title"];
 
     charList = List.from(
         gridString.split('').map((char) => CharPosition(char: char, idx: i++)));
 
     // debug only
-    words = board["words"].cast<String>();
-    paths = board["paths"];
-    code = board["code"];
+    words = data["words"].cast<String>();
+    paths = data["paths"];
   }
 
   String title;
   List<CharPosition> charList;
   int sessionId;
-  int boardId;
   String language;
-  String code;
 
   Map paths;
 
@@ -54,6 +49,13 @@ class CharPosition {
   final int idx;
 }
 
+class AuthResponse {
+  AuthResponse({this.token, this.renew_token});
+
+  final String token;
+  final String renew_token;
+}
+
 class HintResponse {
   final String word;
   final List<int> path;
@@ -64,8 +66,8 @@ class HintResponse {
 class MoveResponse {
   MoveResponse(String data) {
     var json = jsonDecode(data);
-    ok = json["ok"];
-    levelComplete = json["levelComplete"];
+    ok = json["valid"];
+    levelComplete = json["complete"];
     moves = json["moves"];
     duration = json["duration"];
   }

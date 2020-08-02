@@ -11,6 +11,7 @@ import 'package:wordroom/hints.dart';
 import 'package:wordroom/settingsview.dart';
 
 import 'linklistener.dart';
+import 'login_page.dart';
 import 'models.dart';
 import 'wordroom_api.dart';
 
@@ -18,7 +19,7 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await PrefService.init(prefix: 'wr_');
 
-  PrefService.setDefaultValues({'language': 'en'});
+  PrefService.setDefaultValues({'language_id': '1'});
 
   runApp(WordRoomOnline());
 }
@@ -34,6 +35,9 @@ class MyBehavior extends ScrollBehavior {
 class WordRoomOnline extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    var email = PrefService.get("email");
+    var needsSignin = email == null;
+
     return MaterialApp(
       title: 'Wordroom',
       theme: ThemeData(
@@ -47,7 +51,7 @@ class WordRoomOnline extends StatelessWidget {
           child: child,
         );
       },
-      home: WordroomPlayGrid(title: 'Wordroom'),
+      home: needsSignin ? LoginPage() : WordroomPlayGrid(title: 'Wordroom'),
     );
   }
 }
@@ -82,17 +86,17 @@ class _WordroomState extends LinkListener<WordroomPlayGrid> {
   }
 
   Future<void> _startLevel() async {
-    var board = await _api.startRandom(PrefService.get("language"));
+    var board = await _api.startRandom(PrefService.get("language_id"));
     setState(() {
       _board = board;
     });
   }
 
   Future<void> _joinLevel(id) async {
-    var board = await _api.join(id);
-    setState(() {
-      _board = board;
-    });
+    //var board = await _api.join(id);
+    //setState(() {
+//      _board = board;
+//    });
   }
 
   @override
@@ -137,7 +141,7 @@ class _WordroomState extends LinkListener<WordroomPlayGrid> {
   void _queueHint() async {
     var hint = await _api.getBoardHint(_board);
     if (hint.path != null && hint.path.isNotEmpty) {
-      hint.path.reversed.forEach((nr) {
+      hint.path.forEach((nr) {
         _hintManager.queueHint(List<int>.filled(1, nr));
       });
     } else {
@@ -186,25 +190,6 @@ class _WordroomState extends LinkListener<WordroomPlayGrid> {
                       }
                     },
                   ))),
-          Center(
-            child: Container(
-                padding: EdgeInsets.fromLTRB(0, 5, 0, 40),
-                child: Text(
-                  "$_currentWord",
-                  style: TextStyle(
-                    color: Colors.white,
-                    letterSpacing: 8,
-                    fontSize: 38,
-                    shadows: [
-                      Shadow(
-                        blurRadius: 4.0,
-                        color: Colors.black,
-                        offset: Offset(2.0, 2.0),
-                      ),
-                    ],
-                  ),
-                )),
-          ),
         ],
       ),
       bottomNavigationBar: BottomAppBar(
