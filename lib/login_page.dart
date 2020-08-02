@@ -18,17 +18,17 @@ class _LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
+        padding: EdgeInsets.all(20),
         decoration: BoxDecoration(
           gradient: LinearGradient(
               begin: Alignment.topRight,
               end: Alignment.bottomLeft,
-              colors: [Colors.blueGrey, Colors.lightBlueAccent]),
+              colors: [Colors.deepPurple, Colors.deepPurpleAccent]),
         ),
         child: ListView(
           children: <Widget>[
             Column(
               children: <Widget>[
-                Text("Email"),
                 TextFormField(
                   onChanged: (val) {
                     PrefService.setString("email", val);
@@ -36,7 +36,7 @@ class _LoginPageState extends State<LoginPage> {
                   initialValue: "mats.tornberg@gmail.com",
                   decoration: InputDecoration(labelText: 'Enter your email'),
                 ),
-                Text("Password"),
+
                 TextFormField(
                   initialValue: "7bananer",
                   obscureText: true,
@@ -49,11 +49,13 @@ class _LoginPageState extends State<LoginPage> {
                   child: Text('Login'),
                   onPressed: () async {
                     var result = await _api.login();
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) =>
-                                WordroomPlayGrid(title: 'Wordroom')));
+                    if (result != null && result.token != null) {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) =>
+                                  WordroomPlayGrid(title: 'Wordroom')));
+                    }
                   },
                 ),
                 FlatButton(

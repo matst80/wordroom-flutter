@@ -40,7 +40,8 @@ class WordRoomOnline extends StatelessWidget {
 
     return MaterialApp(
       title: 'Wordroom',
-      theme: ThemeData(
+      themeMode: ThemeMode.dark,
+      darkTheme: ThemeData(
         primarySwatch: Colors.purple,
         backgroundColor: Colors.purpleAccent.shade700,
         visualDensity: VisualDensity.adaptivePlatformDensity,
