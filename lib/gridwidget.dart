@@ -89,29 +89,51 @@ class _GridWidgetState extends State<GridWidget> with HintProviderWorker {
   int _getWordIndex(idx) {
     int result = 0;
     var i = 0;
-    widget.game.paths.forEach((key, v) {
-      if (v is List<dynamic>) {
-        if (v.contains(idx)) {
-          result = i + 0;
+    if (widget.game != null && widget.game.paths != null) {
+      widget.game.paths.forEach((key, v) {
+        if (v is List<dynamic>) {
+          if (v.contains(idx)) {
+            result = i + 0;
+          }
         }
-      }
-      i++;
-    });
+        i++;
+      });
+    }
     return result;
   }
 
   Color _offset(Color base, int val) {
-    var r = base.red - val;
-    var g = base.green + val;
-    var b = base.blue - val;
-    return base.withGreen(g).withBlue(b).withRed(r);
+    //int r = base.red - (val/2).round();
+    int g = base.green + (val / 2).round();
+    //int b = base.blue - val;
+    return base.withAlpha(255 - val);
   }
 
+  static List<Color> _colors = [
+    Color.fromARGB(255, 85, 239, 196),
+    Color.fromARGB(255, 129, 236, 236),
+    Color.fromARGB(255, 116, 185, 255),
+    Color.fromARGB(255, 162, 155, 254),
+    Color.fromARGB(255, 223, 230, 233),
+    Color.fromARGB(255, 0, 184, 148),
+    Color.fromARGB(255, 0, 206, 201),
+    Color.fromARGB(255, 9, 132, 227),
+    Color.fromARGB(255, 108, 92, 231),
+    Color.fromARGB(255, 178, 190, 195),
+    Color.fromARGB(255, 255, 234, 167),
+    Color.fromARGB(255, 250, 177, 160),
+    Color.fromARGB(255, 255, 118, 117),
+    Color.fromARGB(255, 253, 121, 168),
+    Color.fromARGB(255, 99, 110, 114),
+    Color.fromARGB(255, 253, 203, 110),
+    Color.fromARGB(255, 225, 112, 85),
+    Color.fromARGB(255, 214, 48, 49),
+    Color.fromARGB(255, 232, 67, 147),
+    Color.fromARGB(255, 45, 52, 54)
+  ];
+
   Color _getColor(idx) {
-    if (widget.game.paths != null) {
-      return _offset(Colors.deepPurple, _getWordIndex(idx) * 15);
-    }
-    return Colors.deepPurple;
+    return _colors[_getWordIndex(idx) % _colors.length];
   }
 
   List<CharWidget> _getChars() =>

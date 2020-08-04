@@ -19,16 +19,18 @@ class CharWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AnimatedContainer(
-        duration: Duration(milliseconds: 200),
+        duration: Duration(milliseconds: 400),
         decoration: BoxDecoration(
           color: taken
-              ? Colors.transparent
-              : highlighted
-                  ? Colors.lightGreen
-                  : selected ? Colors.purpleAccent : wordColor ?? Colors.purple,
+              ? Colors.pinkAccent.withAlpha(0)
+              : highlighted || selected
+                  ? Colors.pinkAccent
+                  : wordColor ?? Colors.pink,
           border: Border.all(
               style: taken ? BorderStyle.none : BorderStyle.solid,
-              color: selected ? Colors.purpleAccent : Colors.purple.shade100,
+              color: selected
+                  ? Colors.white.withAlpha(150)
+                  : Colors.white.withAlpha(250),
               width: 2),
           borderRadius: BorderRadius.all(Radius.circular(5.0)),
         ),
@@ -39,6 +41,17 @@ class CharWidget extends StatelessWidget {
             },
             child: Center(
                 child: Text(taken ? '' : char.toUpperCase(),
-                    style: TextStyle(color: Colors.white, fontSize: 27)))));
+                    style: TextStyle(
+                        shadows: [
+                          Shadow(
+                            blurRadius: 6.0,
+                            color: Colors.black.withAlpha(180),
+                            offset: Offset(1.0, 1.0),
+                          ),
+                        ],
+                        color: selected || highlighted
+                            ? Colors.white
+                            : Colors.white,
+                        fontSize: 32)))));
   }
 }
